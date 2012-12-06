@@ -11,8 +11,7 @@ There are two files we care about:
 1. **index.html** - This file does three things:
 	* Creates empty DOM elements named content1-content3 into which our code will drop.
 	* Loads our javascript libraries (jquery, underscore, backbone).
-	* Creates our examples when the DOM has finished loading.
-	
+	* Creates our examples when the DOM has finished loading.	
 2. **app.js** - This file contains the javascript examples.
 
 ## Namespacing
@@ -45,14 +44,15 @@ OK, with that out of the way, let's learn the difference between functions and c
 
 ### Example 1 - Calling a Function Object
 
-In our first example index.html, we call this function's `get` method like so:
+Open index.html in your text editor and take a look at the `<script>` block near the bottom. You'll see:
 
+	// Example 1: Calling a function object.
 	app.functionTweets.get({
 	  id:"DEVOPS_BORAT",
 	  el:$("#content1")
 	});
 
-passing in a `params` hash with the Twitter username and the DOM element into which we'd like to put the results. Over in app.js, `app.functionTweets` looks like this:
+What we're doing here is calling the function `app.function.get` and passing in a `params` hash with the Twitter username and the DOM element into which we'd like to put the results. Over in app.js, `app.functionTweets` looks like this:
 
 	app.functionTweets = {
 	  get: function(params){
@@ -60,21 +60,23 @@ passing in a `params` hash with the Twitter username and the DOM element into wh
 	    params.id = params.id || "baspete",
 	    params.el = params.el || $("#content1");
 	
-	    // Nested, named callbacks
+	    // Get the tweets (async XHR), then parse and render them
 	    app.getTweets(params.id, function(data){
-	      app.parseTweets(data, function(tweets){
-	        app.insert(tweets, params.el);
-	      });
+	      var tweets = app.parseTweets(data);
+	      app.insert(tweets, params.el);
 	    });
 	  }
-	}; 
+	};
 
-That's a function. In this case, it uses a series of nested named callbacks (defined as methods on the `app` namespace at the top of app.js) to get a user's Twitter feed via XHR, extract and format the tweets into an HTML list, and insert the results into the DOM where we asked it to. Simple.
+That's a function. In this case, it uses a nested named callback to get a user's Twitter feed via XHR, extract and format the tweets into an HTML list, and insert the results into the DOM where we asked it to. 
+
+The key thing to note is that this is a **one time operation**. When we called this function, it executed and closed. We can call it again with different `params` (or even the same ones), but once it closes it's done.
 
 ### Example 2 - Creating an Instance of a Constructor Object
 
 Our second example works a bit differently. It looks like:
 
+	// Example 2: Using a Constructor
 	app.tfln = new app.ConstructorTweets({
 	  id:"TFLN",
 	  el:$("#content2")
@@ -85,7 +87,7 @@ There are two significant differences between this and our first example:
 1. We're using a "new" keyword to create a **new instance** of the `app.ConstructorTweets` object.
 2. We're chaining a call to the object's `init` method to the creation that new instance object.
 
-That new instance is given a name, `app.tfln`. It can be referred to again and again, and changes we make to it have no effect on the app.ConstructorTweets Constructor object.
+That new instance is given a name, `app.tfln`. It lives in memory now, and can be referred to again and again. We can also create new instances with different names, and changes we make to those instances have no effect on each other or the app.ConstructorTweets Constructor object.
 
 **PROTIP:** It's a good idea to name your constructors by capitalizing the first letter. This allows you to easly tell them them from functions or variables, which ususally have a small first letter.
 
@@ -97,7 +99,6 @@ If we look in `app.js`, you'll see that `app.ConstructorTweets` has several meth
 	    // Set defaults if not provided
 	    this.id = params.id || "baspete";
 	    this.el = params.el || $("#content1");
-	    this.tweets = null;
 	    // Get the data and render it (note callback)
 	    var render = this.render,
 	        el = this.el;
@@ -106,18 +107,17 @@ If we look in `app.js`, you'll see that `app.ConstructorTweets` has several meth
 	    });
 	  };
 	
+	  // Get tweets (async XHR), parse the results, set this.tweets, and callback
 	  this.get = function(cb){
-	    // Nested, named callbacks
 	    app.getTweets(this.id, function(data){
-	      app.parseTweets(data, function(tweets){
-	        this.tweets = tweets; // save as attribute for external access
-	        if(typeof(cb)!=="undefined"){
-	          cb();
-	        }
-	      });
+	      this.tweets = app.parseTweets(data);
+	      if(typeof(cb)!=="undefined"){
+	        cb();
+	      }
 	    });
 	  };
 	
+	  // Render the tweets in this.tweets
 	  this.render = function(el){
 	    app.insert(this.tweets, el);
 	  };
@@ -130,6 +130,7 @@ Each of those methods exists after instantiation on our new `app.tfln` object, a
 
 Let's explore the power of an instance a bit more. Take a look at example 3:
 
+	// Example 3: Using a Constructor to create a Backbone Collection & View
 	app.hipster = new app.BackboneTweets({
 	  id: "hipsterhacker",
 	  el: "#content3"
@@ -166,3 +167,10 @@ Let's walk through what happens here:
 4. We call that instance's `fetch` method, again **after** it was created, and pass in a success callback, which itself creates an instance of the app.TweetsView Constructor.
 
 This is the entire point of using a Constructor in Javascript. Doing so allows you to create **instance**, which is an entirely separate object from any other instances of that Constructor. 
+
+### Conclusion
+
+* A function (with some <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Closures" target="_blank">exceptions</a>) runs and returns. 
+* An instance lives until you destroy it. You can refer back to it as often as you'd like, calling its methods and setting or reading its properties.
+
+Backbone is a great example of the use of Constructors. When you create an instance of a Backbone Collection or View, you're generally expecting to access it again in the future--for example, to update its data or re-render its DOM element.

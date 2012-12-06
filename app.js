@@ -1,6 +1,5 @@
 // ###################################################################################
-// APPLICATION NAMESPACE
-// We'll put some resusable functions in here
+// APPLICATION NAMESPACE & UTILITIES
 var app = {
 
   // Get a the tweets from a given user id
@@ -19,13 +18,13 @@ var app = {
 
   // Extract tweets from data and format them as an html list.
   // Note: twitter api returns: {response:{results:[<stuff we want>]}}
-  parseTweets: function(data, cb){
+  parseTweets: function(data){
     var response = "<ul>";
     $.each(data.results, function(i,result){
       response += "<li>" + result.text + "</li>";
     })
     response += "</ul>";
-    cb(response);
+    return response;
   },
 
   // Insert something into the DOM
@@ -34,8 +33,6 @@ var app = {
   }
 
 };
-
-
 
 
 // ###################################################################################
@@ -48,16 +45,13 @@ app.functionTweets = {
     params.id = params.id || "baspete",
     params.el = params.el || $("#content1");
 
-    // Nested, named callbacks
+    // Get the tweets (async XHR), then parse and render them
     app.getTweets(params.id, function(data){
-      app.parseTweets(data, function(tweets){
-        app.insert(tweets, params.el);
-      });
+      var tweets = app.parseTweets(data);
+      app.insert(tweets, params.el);
     });
   }
 };
-
-
 
 
 // ###################################################################################
@@ -71,7 +65,6 @@ app.ConstructorTweets = function(params){
     // Set defaults if not provided
     this.id = params.id || "baspete";
     this.el = params.el || $("#content1");
-    this.tweets = null;
     // Get the data and render it (note callback)
     var render = this.render,
         el = this.el;
@@ -80,25 +73,22 @@ app.ConstructorTweets = function(params){
     });
   };
 
+  // Get tweets (async XHR), parse the results, set this.tweets, and callback
   this.get = function(cb){
-    // Nested, named callbacks
     app.getTweets(this.id, function(data){
-      app.parseTweets(data, function(tweets){
-        this.tweets = tweets; // save as attribute for external access
-        if(typeof(cb)!=="undefined"){
-          cb();
-        }
-      });
+      this.tweets = app.parseTweets(data);
+      if(typeof(cb)!=="undefined"){
+        cb();
+      }
     });
   };
 
+  // Render the tweets in this.tweets
   this.render = function(el){
     app.insert(this.tweets, el);
   };
 
 };
-
-
 
 
 // ###################################################################################
