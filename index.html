@@ -23,13 +23,13 @@ $("document").ready(function(){
   });
 
   // Constructor example.
-  var tfln = new app.ConstructorTweets({
+  app.tfln = new app.ConstructorTweets({
     id:"TFLN",
     el:$("#content2")
   }).init();
 
   // Backbone example
-  var hipsterApp = new app.BackboneTweets({
+  app.hipsterApp = new app.BackboneTweets({
     id: "hipsterhacker",
     el: "#content3"
   });
