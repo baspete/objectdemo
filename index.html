@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+
+<div id="content1"></div>
+<div id="content2"></div>
+<div id="content3"></div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="underscore-min.js"></script>
+<script src="backbone-min.js"></script>
+<script src="app.js"></script>
+
+<script>
+// Initialization functions, for when the DOM is complete
+$("document").ready(function(){
+
+  // Object example.
+  app.objectTweets.get({     // this call will override the defaults
+    id:"DEVOPS_BORAT",
+    el:$("#content1")
+  });
+
+  // Constructor example.
+  var tfln = new app.ConstructorTweets({
+    id:"TFLN",
+    el:$("#content2")
+  }).init();
+
+  // Backbone example
+  var hipsterApp = new app.BackboneTweets({
+    id: "hipsterhacker",
+    el: "#content3"
+  });
+
+});
+</script>
+</body>
+
