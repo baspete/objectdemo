@@ -1,6 +1,3 @@
-objectdemo
-==========
-
 This is a quick demo to show the difference between a function and a constructor in Javascript. It also has a backbone.js example.
 
 ## Installation
