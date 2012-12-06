@@ -101,16 +101,16 @@ app.BackboneTweets = function(params){
   var id = params.id || "baspete";
   var el = params.el || $("#content1");
   // Create a Collection
-  var hipsterTweets = new app.TwitterFeed();
+  var tweets = new app.TwitterFeed();
   // ... pass in the id so it knows what URL to go to
-  hipsterTweets.id = id;
+  tweets.id = id;
   // ... and fetch the data
-  hipsterTweets.fetch({
+  tweets.fetch({
     dataType:'jsonp',
     success: function(results){
       // Create and render a View
       var tweetsView = new app.TweetsView({
-        collection: hipsterTweets,
+        collection: tweets,
         el: el
       }).render();
     }
