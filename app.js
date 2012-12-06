@@ -39,10 +39,10 @@ var app = {
 
 
 // ###################################################################################
-// OBJECT EXAMPLE
+// FUNCTION EXAMPLE
 // Here's an object with a single method, "get()".
 // You use it by calling the method directly.
-app.objectTweets = {
+app.functionTweets = {
   get: function(params){
     // Set defaults if not provided
     params.id = params.id || "baspete",
@@ -119,7 +119,7 @@ app.BackboneTweets = function(params){
     dataType:'jsonp',
     success: function(results){
       // Create and render a View
-      var hipsterView = new app.TweetsView({
+      var tweetsView = new app.TweetsView({
         collection: hipsterTweets,
         el: el
       }).render();

@@ -16,20 +16,20 @@
 // Initialization functions, for when the DOM is complete
 $("document").ready(function(){
 
-  // Object example.
-  app.objectTweets.get({     // this call will override the defaults
+  // Example 1: Calling a function object.
+  app.functionTweets.get({
     id:"DEVOPS_BORAT",
     el:$("#content1")
   });
 
-  // Constructor example.
+  // Example 2: Using a Constructor
   app.tfln = new app.ConstructorTweets({
     id:"TFLN",
     el:$("#content2")
   }).init();
 
-  // Backbone example
-  app.hipsterApp = new app.BackboneTweets({
+  // Example 3: Using a Constructor to create a Backbone Collection & View
+  app.hipster = new app.BackboneTweets({
     id: "hipsterhacker",
     el: "#content3"
   });
